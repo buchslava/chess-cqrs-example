@@ -1,0 +1,25 @@
+{
+  "name": "chess-cqrs-example",
+  "version": "1.0.0",
+  "description": "Chess CQRS ecample",
+  "license": "MIT",
+  "scripts": {
+    "prestart": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "board": "npm run prestart && node dist/board.js"
+  },
+  "dependencies": {
+    "blessed": "0.1.81",
+    "blessed-contrib": "4.8.5",
+    "colors": "1.2.1",
+    "lodash": "4.17.10",
+    "node-ipc": "9.1.1",
+    "typescript": "2.5.3"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.14.108",
+    "@types/node": "8.0.31",
+    "@types/node-ipc": "9.1.0",
+    "ts-node": "3.3.0"
+  }
+}
