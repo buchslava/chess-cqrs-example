@@ -1,6 +1,6 @@
 import * as ipc from 'node-ipc';
+import { isEmpty } from 'lodash';
 
-ipc.config.id = 'hello';
 ipc.config.retry = 1500;
 ipc.config.logger = () => { };
 
@@ -14,28 +14,25 @@ const moves = [
     { from: 'h5', to: 'f7' }
 ].reverse();
 
-// const eventStore = [];
+const eventStore = [];
 
 ipc.connectToNet('world', () => {
-    ipc.of.world.on('connect', () => {
-        let inter = setInterval(nextMove, 2000);
-
-        function nextMove() {
+    ipc.of.world.on('connect', () => {        
+        const nextMove = () => {
             const move = moves.pop();
 
+            eventStore.push(move);
             ipc.of.world.emit('move', move);
 
-            if (moves.length === 0) {
+            if (isEmpty(moves)) {
+                ipc.of.world.emit('finish', {});
                 clearInterval(inter);
             }
         };
-        // ipc.log('## connected to world ##');
 
+        const inter = setInterval(nextMove, 2000);
     });
     ipc.of.world.on('disconnect', () => {
         // ipc.log('disconnected from world');
-    });
-    ipc.of.world.on('message', (data) => {
-        // ipc.log('got a message from world : ', data);
     });
 });
