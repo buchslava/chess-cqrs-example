@@ -17,6 +17,7 @@
     "typescript": "2.5.3"
   },
   "devDependencies": {
+    "@types/colors": "^1.2.1",
     "@types/lodash": "4.14.108",
     "@types/node": "8.0.31",
     "@types/node-ipc": "9.1.0",
