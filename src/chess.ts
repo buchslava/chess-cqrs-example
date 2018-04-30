@@ -15,11 +15,6 @@ enum Colors {
     WHITE, BLACK
 }
 
-export interface MoveDescriptor {
-    from: string;
-    to: string;
-}
-
 interface Cell {
     t: Types;
     c?: Colors;
@@ -35,6 +30,19 @@ const emptyLine: Cell[] = [
     { t: Types.empty },
     { t: Types.empty }
 ];
+
+function getBoardCoordinateByMove(chessPosition: string): number[] {
+    const [chessColumn, chessRow] = chessPosition.split('');
+    const boardColumn = chessColumn.charCodeAt(0) - 97;
+    const boardRow = 8 - (+chessRow);
+
+    return [boardRow, boardColumn];
+}
+
+export interface MoveDescriptor {
+    from: string;
+    to: string;
+}
 
 export const initBoard: Cell[][] = [
     [
@@ -79,14 +87,6 @@ export const initBoard: Cell[][] = [
         { t: Types.rook, c: Colors.WHITE },
     ]
 ];
-
-function getBoardCoordinateByMove(chessPosition: string): number[] {
-    const [chessColumn, chessRow] = chessPosition.split('');
-    const boardColumn = chessColumn.charCodeAt(0) - 97;
-    const boardRow = 8 - (+chessRow);
-
-    return [boardRow, boardColumn];
-}
 
 export function getBoardView(currentBoard) {
     const boardView: string[][] = [[' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']];
