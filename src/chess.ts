@@ -36,7 +36,7 @@ const emptyLine: Cell[] = [
     { t: Types.empty }
 ];
 
-let board: Cell[][] = [
+export const initBoard: Cell[][] = [
     [
         { t: Types.rook, c: Colors.BLACK },
         { t: Types.knight, c: Colors.BLACK },
@@ -88,11 +88,11 @@ function getBoardCoordinateByMove(chessPosition: string): number[] {
     return [boardRow, boardColumn];
 }
 
-export function getBoardView() {
+export function getBoardView(currentBoard) {
     const boardView: string[][] = [[' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']];
     let rowNumber = 8;
 
-    for (const row of board) {
+    for (const row of currentBoard) {
         const rowLabel = (rowNumber--).toString();
         const rowData = row.map(cell => cell.c === Colors.BLACK ? colors.blue(cell.t) : colors.yellow(cell.t));
         boardView.push([rowLabel, ...rowData]);
@@ -101,15 +101,15 @@ export function getBoardView() {
     return boardView;
 }
 
-export function chessMoveHandler(data: MoveDescriptor, onChessMoveProessed: Function) {
-    const newBoard = cloneDeep(board);
+export function chessMoveHandler(data: MoveDescriptor, currentBoard, onChessMoveProessed: Function) {
+    const newBoard = cloneDeep(currentBoard);
     const fromBoardObj = getBoardCoordinateByMove(data.from);
     const toBoardObj = getBoardCoordinateByMove(data.to);
 
-    newBoard[toBoardObj[0]][toBoardObj[1]] = cloneDeep(board[fromBoardObj[0]][fromBoardObj[1]]);
+    newBoard[toBoardObj[0]][toBoardObj[1]] = cloneDeep(currentBoard[fromBoardObj[0]][fromBoardObj[1]]);
     newBoard[fromBoardObj[0]][fromBoardObj[1]] = cloneDeep(emptyLine[0]);
 
-    board = newBoard;
+    currentBoard = newBoard;
 
-    onChessMoveProessed();
+    onChessMoveProessed(newBoard);
 }
