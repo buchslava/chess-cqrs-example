@@ -10,18 +10,16 @@ ipc.config.logger = () => { };
 
 ipc.serveNet(() => {
     const denormalizedData = [];
-    const bs = new BehaviorSubject(initBoard);
+    const denormalizedDataSubject = new BehaviorSubject(initBoard);
 
-    bs.subscribe(newBoard => {
+    denormalizedDataSubject.subscribe(newBoard => {
         denormalizedData.push(newBoard);
         showNewBoard(newBoard);
     });
 
-    bs.next(initBoard);
-
     ipc.server.on('move', (data: MoveDescriptor) => {
         chessMoveHandler(data, last(denormalizedData), (newBoard) => {
-            bs.next(newBoard);
+            denormalizedDataSubject.next(newBoard);
         });
     });
 
