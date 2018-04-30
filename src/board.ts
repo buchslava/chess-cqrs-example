@@ -1,9 +1,7 @@
 import * as ipc from 'node-ipc';
+import { BehaviorSubject } from 'rxjs';
 import { last } from 'lodash'
-import { EventEmitter } from 'events';
 import { getBoardView, chessMoveHandler, MoveDescriptor, initBoard } from './chess';
-
-const denormalizedDataEvent = new EventEmitter();
 
 ipc.config.retry = 1500;
 ipc.config.maxConnections = 1;
@@ -12,8 +10,7 @@ ipc.config.logger = () => { };
 const blessed = require('blessed');
 const contrib = require('blessed-contrib');
 const screen = blessed.screen();
-
-var table = contrib.table({
+const table = contrib.table({
     fg: 'white',
     border: { type: 'line', fg: 'cyan' },
     columnSpacing: 2,
@@ -23,8 +20,6 @@ var table = contrib.table({
 });
 
 table.focus();
-
-const denormalizedData = [];
 
 const inputBar = blessed.textbox({ bottom: 0, left: 0, height: 1, width: 20, style: { fg: 'white', bg: 'blue' } });
 
@@ -38,14 +33,21 @@ screen.render()
 
 
 ipc.serveNet(() => {
-    denormalizedData.push(initBoard);
-    denormalizedDataEvent.emit('new-board', initBoard);
+    const denormalizedData = [];
+    const bs = new BehaviorSubject(initBoard);
+
+    bs.subscribe(newBoard => {
+        denormalizedData.push(newBoard);
+        table.setData({ headers: [], data: getBoardView(newBoard) })
+        screen.render();    
+    });
+    
+    bs.next(initBoard);
 
     ipc.server.on('move', (data: MoveDescriptor) => {
         chessMoveHandler(data, last(denormalizedData), (newBoard) => {
-            denormalizedData.push(newBoard);
-            denormalizedDataEvent.emit('new-board', newBoard);
-        })
+            bs.next(newBoard);
+        });
     });
 
     ipc.server.on('finish', () => {
@@ -63,9 +65,3 @@ ipc.server.on('error', (err) => {
 });
 
 ipc.server.start();
-
-
-denormalizedDataEvent.on('new-board', (newBoard) => {
-    table.setData({ headers: [], data: getBoardView(newBoard) })
-    screen.render();
-});
