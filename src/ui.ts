@@ -1,6 +1,11 @@
 import * as blessed from 'blessed';
 import * as contrib from 'blessed-contrib';
-import { getBoardView } from './chess';
+import { Cell, getBoardView } from './chess';
+import { 
+    uiEvent,
+    EVENT_GOT_PREV_STATE,
+    EVENT_GOT_NEXT_STATE
+} from './shared';
 
 const chessScreen = blessed.screen();
 const table = contrib.table({
@@ -22,9 +27,14 @@ chessScreen.append(table);
 chessScreen.append(inputBar);
 
 chessScreen.key(['escape', 'q', 'C-c'], () => process.exit(0));
+chessScreen.key(['a'], () => uiEvent.emit('request-prev-state'));
+chessScreen.key(['s'], () => uiEvent.emit('request-next-state'));
 chessScreen.render();
 
-export function showNewBoard(newBoard) {
+uiEvent.on(EVENT_GOT_PREV_STATE, (board: Cell[][]) => showNewBoard(board));
+uiEvent.on(EVENT_GOT_NEXT_STATE, (board: Cell[][]) => showNewBoard(board));
+
+export function showNewBoard(newBoard: Cell[][]) {
     table.setData({ headers: [], data: getBoardView(newBoard) })
     chessScreen.render();
 }

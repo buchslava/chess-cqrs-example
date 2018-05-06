@@ -15,7 +15,7 @@ enum Colors {
     WHITE, BLACK
 }
 
-interface Cell {
+export interface Cell {
     t: Types;
     c?: Colors;
 }
@@ -88,7 +88,7 @@ export const initBoard: Cell[][] = [
     ]
 ];
 
-export function getBoardView(currentBoard) {
+export function getBoardView(currentBoard): string[][] {
     const boardView: string[][] = [[' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']];
     let rowNumber = 8;
 
