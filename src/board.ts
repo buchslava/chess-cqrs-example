@@ -3,13 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { last } from 'lodash';
 import { showNewBoard, updateStatus } from './ui';
 import { chessMoveHandler, MoveDescriptor, Cell, initBoard } from './chess';
-import {
-    uiEvent,
-    EVENT_REQUEST_PREV_STATE,
-    EVENT_REQUEST_NEXT_STATE,
-    EVENT_GOT_PREV_STATE,
-    EVENT_GOT_NEXT_STATE
-} from './shared';
+import { uiEvent, BoardUIEvents } from './shared';
 
 ipc.config.retry = 1500;
 ipc.config.maxConnections = 1;
@@ -39,14 +33,14 @@ ipc.serveNet(() => {
         console.log('DISCONNECTED\n\n', arguments);
     });*/
 
-    uiEvent.on(EVENT_REQUEST_PREV_STATE, () => {
+    uiEvent.on(BoardUIEvents.REQUEST_PREV_STATE, () => {
         if (!isNaN(currentBoardIndex) && currentBoardIndex - 1 >= 0) {
-            uiEvent.emit(EVENT_GOT_PREV_STATE, denormalizedData[--currentBoardIndex]);
+            uiEvent.emit(BoardUIEvents.GOT_PREV_STATE, denormalizedData[--currentBoardIndex]);
         }
     });
-    uiEvent.on(EVENT_REQUEST_NEXT_STATE, () => {
+    uiEvent.on(BoardUIEvents.REQUEST_NEXT_STATE, () => {
         if (!isNaN(currentBoardIndex) && currentBoardIndex + 1 < denormalizedData.length) {
-            uiEvent.emit(EVENT_GOT_NEXT_STATE, denormalizedData[++currentBoardIndex]);
+            uiEvent.emit(BoardUIEvents.GOT_NEXT_STATE, denormalizedData[++currentBoardIndex]);
         }
     });
 });
