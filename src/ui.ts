@@ -1,7 +1,7 @@
 import * as blessed from 'blessed';
 import * as contrib from 'blessed-contrib';
 import { Cell, getBoardView } from './chess';
-import { uiEvent, BoardUIEvents } from './shared';
+import { uiEvent, BoardUIEvents, UIResponse } from './shared';
 
 const chessScreen = blessed.screen();
 const table = contrib.table({
@@ -27,8 +27,14 @@ chessScreen.key(['a'], () => uiEvent.emit('request-prev-state'));
 chessScreen.key(['s'], () => uiEvent.emit('request-next-state'));
 chessScreen.render();
 
-uiEvent.on(BoardUIEvents.GOT_PREV_STATE, (board: Cell[][]) => showNewBoard(board));
-uiEvent.on(BoardUIEvents.GOT_NEXT_STATE, (board: Cell[][]) => showNewBoard(board));
+uiEvent.on(BoardUIEvents.GOT_PREV_STATE, (moveDescriptor: UIResponse) => {
+    showNewBoard(moveDescriptor.board);
+    updateStatus(`Move ${moveDescriptor.moveNumber}`);
+});
+uiEvent.on(BoardUIEvents.GOT_NEXT_STATE, (moveDescriptor: UIResponse) => {
+    showNewBoard(moveDescriptor.board);
+    updateStatus(`Move ${moveDescriptor.moveNumber}`);
+});
 
 export function showNewBoard(newBoard: Cell[][]) {
     table.setData({ headers: [], data: getBoardView(newBoard) })

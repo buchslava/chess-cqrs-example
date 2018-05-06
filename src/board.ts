@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { last } from 'lodash';
 import { showNewBoard, updateStatus } from './ui';
 import { chessMoveHandler, MoveDescriptor, Cell, initBoard } from './chess';
-import { uiEvent, BoardUIEvents } from './shared';
+import { uiEvent, BoardUIEvents, UIResponse } from './shared';
 
 ipc.config.retry = 1500;
 ipc.config.maxConnections = 1;
@@ -35,12 +35,22 @@ ipc.serveNet(() => {
 
     uiEvent.on(BoardUIEvents.REQUEST_PREV_STATE, () => {
         if (!isNaN(currentBoardIndex) && currentBoardIndex - 1 >= 0) {
-            uiEvent.emit(BoardUIEvents.GOT_PREV_STATE, denormalizedData[--currentBoardIndex]);
+            const response: UIResponse = {
+                moveNumber: --currentBoardIndex + 1,
+                board: denormalizedData[currentBoardIndex]
+            };
+
+            uiEvent.emit(BoardUIEvents.GOT_PREV_STATE, response);
         }
     });
     uiEvent.on(BoardUIEvents.REQUEST_NEXT_STATE, () => {
         if (!isNaN(currentBoardIndex) && currentBoardIndex + 1 < denormalizedData.length) {
-            uiEvent.emit(BoardUIEvents.GOT_NEXT_STATE, denormalizedData[++currentBoardIndex]);
+            const response: UIResponse = {
+                moveNumber: ++currentBoardIndex + 1,
+                board: denormalizedData[currentBoardIndex]
+            };
+
+            uiEvent.emit(BoardUIEvents.GOT_NEXT_STATE, response);
         }
     });
 });
